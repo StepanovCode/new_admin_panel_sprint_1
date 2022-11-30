@@ -1,31 +1,41 @@
 import logging
+
+from config import dsl, sqlite_path
 import sqlite3
 import psycopg2
 from psycopg2.extensions import connection as _connection
 from psycopg2.extras import DictCursor
+from contextlib import contextmanager
 
-from extractor import SQLiteExtractor, DataExtractor
-from saver import PostgresSaver, DataSaver
+from extractor import SQLiteExtractor
+from saver import PostgresSaver
+
+
+@contextmanager
+def conn_context(db_path: str):
+    conn = sqlite3.connect(db_path)
+    conn.row_factory = sqlite3.Row
+    yield conn
+    conn.close()
 
 
 def load_from_sqlite(connection: sqlite3.Connection, pg_conn: _connection):
     """Основной метод загрузки данных из SQLite в Postgres"""
     sqlite_extractor = SQLiteExtractor(connection)
-    data = DataExtractor(sqlite_extractor).extract()
-
     postgres_saver = PostgresSaver(pg_conn)
-    done = DataSaver(postgres_saver).saver(data)
-    logging.info(done)
+
+    sqlite_extractor.extract_movies()
+    for data in sqlite_extractor.extract_movies():
+        if data:
+            postgres_saver.save_all_data(data)
+
+    logging.info(
+        'Передача данных завершена'
+    )
 
 
 if __name__ == '__main__':
-    logging.getLogger().setLevel(logging.INFO)
-    dsl = {'dbname': 'movies_database',
-           'user': 'app',
-           'password': '123qwe',
-           'host': '127.0.0.1',
-           'port': 8090
-           }
-    with sqlite3.connect('db.sqlite') as sqlite_conn, \
+    logging.getLogger()
+    with conn_context(sqlite_path) as sqlite_conn, \
             psycopg2.connect(**dsl, cursor_factory=DictCursor) as pg_conn:
         load_from_sqlite(sqlite_conn, pg_conn)

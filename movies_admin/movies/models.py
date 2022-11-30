@@ -50,6 +50,13 @@ class GenreFilmwork(UUIDMixin):
         verbose_name = _('genre_verbose_name')
         verbose_name_plural = _('genre_verbose_n_pl')
 
+        indexes = [
+            models.Index(fields=['film_work'],
+                         name='genre_film_work_film_work_idx'),
+            models.Index(fields=['genre'],
+                         name='genre_film_work_genre_idx'),
+        ]
+
     def __str__(self):
         return ''
 
@@ -80,6 +87,13 @@ class PersonFilmwork(UUIDMixin):
         db_table = "content\".\"person_film_work"
         verbose_name = _('person_verbose_name')
         verbose_name_plural = _('person_verbose_n_pl')
+
+        indexes = [
+            models.Index(fields=['person'],
+                         name='person_film_work_person_idx'),
+            models.Index(fields=['film_work'],
+                         name='person_film_work_film_work_idx'),
+        ]
 
     def __str__(self):
         return ''
@@ -127,6 +141,10 @@ class Filmwork(UUIDMixin, TimeStampedMixin):
         db_table = "content\".\"film_work"
         verbose_name = _('film_work_verbose_name')
         verbose_name_plural = _('film_work_verbose_n_pl')
+
+        indexes = [
+            models.Index(fields=['title'], name='film_work_title_idx'),
+        ]
 
     def __str__(self):
         return self.title
