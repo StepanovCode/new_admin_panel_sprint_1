@@ -36,6 +36,18 @@ class Genre(UUIDMixin, TimeStampedMixin):
         return self.name
 
 
+class Person(UUIDMixin, TimeStampedMixin):
+    full_name = models.CharField(_('full_name'), max_length=255, blank=True)
+
+    class Meta:
+        db_table = "content\".\"person"
+        verbose_name = _('person_verbose_name')
+        verbose_name_plural = _('person_verbose_n_pl')
+
+    def __str__(self):
+        return self.full_name
+
+
 class GenreFilmwork(UUIDMixin):
     film_work = models.ForeignKey('Filmwork', on_delete=models.CASCADE)
     genre = models.ForeignKey(
@@ -49,28 +61,15 @@ class GenreFilmwork(UUIDMixin):
         db_table = "content\".\"genre_film_work"
         verbose_name = _('genre_verbose_name')
         verbose_name_plural = _('genre_verbose_n_pl')
-
-        indexes = [
-            models.Index(fields=['film_work'],
-                         name='genre_film_work_film_work_idx'),
-            models.Index(fields=['genre'],
-                         name='genre_film_work_genre_idx'),
+        constraints = [
+            models.UniqueConstraint(
+                fields=['film_work', 'genre'],
+                name='film_work_genre_idx'
+            )
         ]
 
     def __str__(self):
         return ''
-
-
-class Person(UUIDMixin, TimeStampedMixin):
-    full_name = models.CharField(_('full_name'), max_length=255, blank=True)
-
-    class Meta:
-        db_table = "content\".\"person"
-        verbose_name = _('person_verbose_name')
-        verbose_name_plural = _('person_verbose_n_pl')
-
-    def __str__(self):
-        return self.full_name
 
 
 class PersonFilmwork(UUIDMixin):
@@ -87,12 +86,11 @@ class PersonFilmwork(UUIDMixin):
         db_table = "content\".\"person_film_work"
         verbose_name = _('person_verbose_name')
         verbose_name_plural = _('person_verbose_n_pl')
-
-        indexes = [
-            models.Index(fields=['person'],
-                         name='person_film_work_person_idx'),
-            models.Index(fields=['film_work'],
-                         name='person_film_work_film_work_idx'),
+        constraints = [
+            models.UniqueConstraint(
+                fields=['film_work', 'person', 'role'],
+                name='film_work_person_role_idx'
+            )
         ]
 
     def __str__(self):
@@ -141,10 +139,6 @@ class Filmwork(UUIDMixin, TimeStampedMixin):
         db_table = "content\".\"film_work"
         verbose_name = _('film_work_verbose_name')
         verbose_name_plural = _('film_work_verbose_n_pl')
-
-        indexes = [
-            models.Index(fields=['title'], name='film_work_title_idx'),
-        ]
 
     def __str__(self):
         return self.title

@@ -1,12 +1,12 @@
 import logging
-
-from config import dsl, sqlite_path
 import sqlite3
 import psycopg2
+
 from psycopg2.extensions import connection as _connection
 from psycopg2.extras import DictCursor
 from contextlib import contextmanager
 
+from config import dsl, sqlite_path
 from extractor import SQLiteExtractor
 from saver import PostgresSaver
 
@@ -35,7 +35,9 @@ def load_from_sqlite(connection: sqlite3.Connection, pg_conn: _connection):
 
 
 if __name__ == '__main__':
+
     logging.getLogger()
+
     with conn_context(sqlite_path) as sqlite_conn, \
             psycopg2.connect(**dsl, cursor_factory=DictCursor) as pg_conn:
         load_from_sqlite(sqlite_conn, pg_conn)

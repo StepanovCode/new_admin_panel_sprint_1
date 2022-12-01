@@ -1,10 +1,3 @@
-DROP TABLE content.genre_film_work;
-DROP TABLE content.person_film_work;
-DROP TABLE content.genre;
-DROP TABLE content.person;
-DROP TABLE content.film_work;
-
-
 CREATE SCHEMA IF NOT EXISTS content;
 
 CREATE TABLE IF NOT EXISTS content.film_work(
@@ -54,8 +47,5 @@ CREATE TABLE IF NOT EXISTS content.genre_film_work(
 );
 
 
-CREATE INDEX IF NOT EXISTS film_work_title_idx ON content.film_work(title);
-CREATE INDEX IF NOT EXISTS person_film_work_film_work_idx ON content.person_film_work(film_work_id);
-CREATE INDEX IF NOT EXISTS person_film_work_person_idx ON content.person_film_work(person_id);
-CREATE INDEX IF NOT EXISTS genre_film_work_film_work_idx ON content.genre_film_work(film_work_id);
-CREATE INDEX IF NOT EXISTS genre_film_work_genre_idx ON content.genre_film_work(genre_id);
+CREATE UNIQUE INDEX film_work_person_role_idx ON content.person_film_work (film_work_id, person_id, role);
+CREATE UNIQUE INDEX film_work_genre_idx ON content.genre_film_work (film_work_id, genre_id);

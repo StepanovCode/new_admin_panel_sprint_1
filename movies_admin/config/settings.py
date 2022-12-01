@@ -22,7 +22,7 @@ include(
 )
 
 INTERNAL_IPS = [
-    "127.0.0.1",
+    os.environ.get('HOST'),
 ]
 
 STATIC_URL = '/static/'
